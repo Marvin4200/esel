@@ -46,6 +46,8 @@
       position: sticky; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; justify-content: space-between; align-items: center;
       padding: 0.8rem 2rem;
+      width: 100%;
+      min-width: 0;
       background: rgba(8,8,16,0.75);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
@@ -118,7 +120,11 @@
     .btn:active { transform: scale(0.97); }
 
     @media (max-width: 500px) {
-      .topnav { padding: 0.6rem 1rem; }
+      .topnav { padding: 0.6rem 0.75rem; }
+      .nav-brand { font-size: 0.85rem; white-space: nowrap; }
+      .nav-links { overflow-x: auto; scrollbar-width: none; flex-shrink: 1; min-width: 0; max-width: 62vw; }
+      .nav-links::-webkit-scrollbar { display: none; }
+      .nav-link { white-space: nowrap; padding: 0.28rem 0.55rem; font-size: 0.72rem; }
       .title { font-size: 1.5rem; }
     }
   </style>
@@ -144,7 +150,7 @@
 
   <div class="esel-box" id="esel-box">
     <div class="esel-loading" id="loading">🫏</div>
-    <img class="esel-img" id="esel-img" src="" alt="Esel" style="display:none"
+    <img class="esel-img" id="esel-img" alt="Esel" style="display:none"
       onload="imgLoaded()" onerror="imgError()">
   </div>
 
