@@ -9,13 +9,16 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #080810;
-      --surface: rgba(255,255,255,0.03);
-      --border: rgba(255,255,255,0.07);
-      --border2: rgba(255,255,255,0.14);
-      --text: #e2e8f0;
-      --muted: #4a5568;
-      --accent: #818cf8;
+      --bg:           #080810;
+      --surface:      rgba(255,255,255,0.04);
+      --surface2:     rgba(255,255,255,0.07);
+      --border:       rgba(255,255,255,0.08);
+      --border-hover: rgba(255,255,255,0.14);
+      --text:         #e2e8f0;
+      --muted:        #64748b;
+      --accent:       #818cf8;
+      --accent2:      #667eea;
+      --pink:         #f093fb;
     }
 
     body {
@@ -40,21 +43,21 @@
 
     /* Nav */
     .topnav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      position: sticky; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; justify-content: space-between; align-items: center;
-      padding: 0.7rem 2rem;
+      padding: 0.8rem 2rem;
       background: rgba(8,8,16,0.75);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
     }
-    .nav-brand { font-weight: 700; font-size: 0.95rem; text-decoration: none; color: var(--text); }
+    .nav-brand { font-weight: 700; font-size: 1rem; text-decoration: none; color: var(--text); }
     .nav-links { display: flex; gap: 0.5rem; }
     .nav-link {
-      padding: 0.3rem 0.8rem; border-radius: 7px; font-size: 0.78rem;
+      padding: 0.35rem 0.9rem; border-radius: 7px; font-size: 0.8rem;
       font-weight: 600; text-decoration: none; color: var(--muted);
       border: 1px solid var(--border); transition: color 0.2s, border-color 0.2s;
     }
-    .nav-link:hover { color: var(--text); border-color: var(--border2); }
+    .nav-link:hover { color: var(--text); border-color: var(--border-hover); }
 
     /* Main */
     .container {
@@ -106,12 +109,12 @@
     /* Button */
     .btn {
       padding: 0.75rem 2rem;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      border: none; border-radius: 12px;
-      color: white; font-size: 1rem; font-weight: 700;
-      cursor: pointer; transition: transform 0.15s, filter 0.15s;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border: none; border-radius: 8px;
+      color: white; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; transition: transform 0.15s, opacity 0.15s;
     }
-    .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    .btn:hover { transform: translateY(-2px); opacity: 0.9; }
     .btn:active { transform: scale(0.97); }
 
     @media (max-width: 500px) {
@@ -125,6 +128,9 @@
 <nav class="topnav">
   <a class="nav-brand" href="https://eselbande.com">🫏 eselbande.com</a>
   <div class="nav-links">
+    <a class="nav-link" href="https://go.eselbande.com">🔗 Links</a>
+    <a class="nav-link" href="https://files.eselbande.com">📁 Files</a>
+    <a class="nav-link" href="https://quotes.eselbande.com">💬 Zitate</a>
     <a class="nav-link" href="https://team.eselbande.com">👥 Team</a>
     <a class="nav-link" href="https://status.eselbande.com">📡 Status</a>
   </div>
