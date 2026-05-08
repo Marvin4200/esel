@@ -6,58 +6,41 @@ const http = require('http');
 const app = express();
 const PORT = process.env.PORT || 3015;
 
-const ESEL_FILES = [
-  'Donkey_1_arp_750px.jpg',
-  'Donkey_in_Clovelly%2C_North_Devon%2C_England.jpg',
-  'Equus_africanus_asinus_2005.jpg',
-  'Two_donkeys_2012.jpg',
-  'Donkey_Equus_asinus.jpg',
-  'Donkey_in_Jordan.jpg',
-  'Burro%28Equus_asinus%2904.jpg',
-  'Esel_1_Zugspitze.jpg',
-  'Donkey_in_Santorini.jpg',
-  'Baby_donkey_%28Equus_asinus%29_at_the_Honolulu_Zoo.jpg',
-];
+// loremflickr returns a random CC-licensed flickr photo per request
+const LOREMFLICKR_URL = 'https://loremflickr.com/800/600/donkey';
 
-function fetchUrl(url, redirects = 5) {
+function fetchImage(url, baseUrl) {
   return new Promise((resolve, reject) => {
-    if (redirects === 0) return reject(new Error('Too many redirects'));
     const mod = url.startsWith('https') ? https : http;
-    mod.get(url, {
-      headers: {
-        'User-Agent': 'EselBot/1.0 (https://esel.eselbande.com; marvin@eselbande.com)',
-        'Accept': 'image/*',
-      }
+    const req = mod.get(url, {
+      headers: { 'User-Agent': 'EselBot/1.0 (https://esel.eselbande.com)' }
     }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return resolve(fetchUrl(res.headers.location, redirects - 1));
+        res.resume();
+        const location = res.headers.location;
+        const next = location.startsWith('http') ? location : new URL(location, baseUrl || url).href;
+        return resolve(fetchImage(next, baseUrl || url));
       }
-      if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}`));
+      if (res.statusCode !== 200) {
+        res.resume();
+        return reject(new Error(`HTTP ${res.statusCode}`));
+      }
       resolve(res);
-    }).on('error', reject);
+    });
+    req.on('error', reject);
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
   });
 }
 
 app.get('/api/esel', async (req, res) => {
-  const files = [...ESEL_FILES];
-  // shuffle to try random order
-  for (let i = files.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [files[i], files[j]] = [files[j], files[i]];
+  try {
+    const stream = await fetchImage(LOREMFLICKR_URL);
+    res.set('Content-Type', stream.headers['content-type'] || 'image/jpeg');
+    res.set('Cache-Control', 'no-store');
+    stream.pipe(res);
+  } catch (e) {
+    res.status(502).json({ error: 'no esel found' });
   }
-  for (const file of files) {
-    const url = `https://commons.wikimedia.org/wiki/Special:FilePath/${file}`;
-    try {
-      const stream = await fetchUrl(url);
-      res.set('Content-Type', stream.headers['content-type'] || 'image/jpeg');
-      res.set('Cache-Control', 'no-store');
-      stream.pipe(res);
-      return;
-    } catch (e) {
-      // try next
-    }
-  }
-  res.status(502).json({ error: 'no esel found' });
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
