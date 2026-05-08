@@ -48,7 +48,12 @@ function fetchImage(url, baseUrl, depth = 0) {
 app.get('/api/esel', async (req, res) => {
   try {
     const stream = await fetchImage(LOREMFLICKR_URL);
-    res.set('Content-Type', stream.headers['content-type'] || 'image/jpeg');
+    const upstreamContentType = String(stream.headers['content-type'] || 'image/jpeg');
+    if (!upstreamContentType.toLowerCase().startsWith('image/')) {
+      stream.resume();
+      return res.status(502).json({ error: 'invalid upstream content-type' });
+    }
+    res.set('Content-Type', upstreamContentType);
     res.set('Cache-Control', 'no-store');
     stream.pipe(res);
   } catch (e) {
@@ -66,4 +71,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Interner Serverfehler' });
 });
 
-app.listen(PORT, () => console.log(`[esel.eselbande.com] Running on port ${PORT}`));
+const server = app.listen(PORT, () => console.log(`[esel.eselbande.com] Running on port ${PORT}`));
+
+function shutdown(signal) {
+  console.log(`[SHUTDOWN] ${signal} received`);
+  server.close(() => process.exit(0));
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
