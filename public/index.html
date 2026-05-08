@@ -150,34 +150,30 @@
 </div>
 
 <script>
-const ESEL = [
-  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Donkey_in_Clovelly%2C_North_Devon%2C_England.jpg/640px-Donkey_in_Clovelly%2C_North_Devon%2C_England.jpg', caption: '"Ich bin hier der Chef."' },
-  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Donkey_1_arp_750px.jpg/640px-Donkey_1_arp_750px.jpg', caption: '"Was guckst du?"' },
-  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Equus_africanus_asinus_2005.jpg/640px-Equus_africanus_asinus_2005.jpg', caption: '"Ich höre alles. Alles."' },
-  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Two_donkeys_2012.jpg/640px-Two_donkeys_2012.jpg', caption: '"Wir sind ein Team. Meistens."' },
-  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Donkey_Equus_asinus.jpg/640px-Donkey_Equus_asinus.jpg', caption: '"Ich muss da kurz drüber nachdenken."' },
-  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Donkey_in_Jordan.jpg/640px-Donkey_in_Jordan.jpg', caption: '"Ich bin auf Dienstreise."' },
-  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Burro%28Equus_asinus%29_04.jpg/640px-Burro%28Equus_asinus%29_04.jpg', caption: '"Fotogen? Ich? Na klar."' },
-  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Cute_donkey.jpg/640px-Cute_donkey.jpg', caption: '"Ich weiß dass ich süß bin."' },
-  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Donkey_in_Santorini.jpg/640px-Donkey_in_Santorini.jpg', caption: '"Griechenland? Ja, war okay."' },
-  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Baby_donkey_%28Equus_asinus%29_at_the_Honolulu_Zoo.jpg/640px-Baby_donkey_%28Equus_asinus%29_at_the_Honolulu_Zoo.jpg', caption: '"Ich bin neu hier."' },
+const CAPTIONS = [
+  '"Ich bin hier der Chef."',
+  '"Was guckst du?"',
+  '"Ich höre alles. Alles."',
+  '"Wir sind ein Team. Meistens."',
+  '"Ich muss da kurz drüber nachdenken."',
+  '"Ich bin auf Dienstreise."',
+  '"Fotogen? Ich? Na klar."',
+  '"Ich weiß dass ich süß bin."',
+  '"Griechenland? Ja, war okay."',
+  '"Ich bin neu hier."',
 ];
 
-let current = -1;
 let views = parseInt(localStorage.getItem('esel_views') || '0');
 
 function nextEsel() {
-  let next;
-  do { next = Math.floor(Math.random() * ESEL.length); } while (next === current && ESEL.length > 1);
-  current = next;
-
   const img = document.getElementById('esel-img');
   const loading = document.getElementById('loading');
   img.style.display = 'none';
   loading.style.display = 'flex';
+  loading.textContent = '🫏';
   document.getElementById('caption').textContent = 'Lädt...';
 
-  img.src = ESEL[current].url;
+  img.src = '/api/esel?t=' + Date.now();
   views++;
   localStorage.setItem('esel_views', views);
   document.getElementById('counter').textContent = `Du hast schon ${views} Esel gesehen.`;
@@ -187,18 +183,15 @@ function imgLoaded() {
   errorCount = 0;
   document.getElementById('loading').style.display = 'none';
   document.getElementById('esel-img').style.display = 'block';
-  document.getElementById('caption').textContent = ESEL[current].caption;
+  const caption = CAPTIONS[Math.floor(Math.random() * CAPTIONS.length)];
+  document.getElementById('caption').textContent = caption;
 }
 
-let errorCount = 0;
 function imgError() {
-  errorCount++;
-  if (errorCount < ESEL.length) {
-    nextEsel();
-  } else {
-    document.getElementById('loading').textContent = '🫏 Kein Esel gefunden.';
-    document.getElementById('caption').textContent = 'Der Esel ist weg.';
-  }
+  document.getElementById('loading').textContent = '🫏';
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('esel-img').style.display = 'none';
+  document.getElementById('caption').textContent = 'Der Esel ist kurz weg. Nochmal versuchen?';
 }
 
 nextEsel();
